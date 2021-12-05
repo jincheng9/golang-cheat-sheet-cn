@@ -68,7 +68,7 @@ golang-cheat-sheet是目前GitHub上最流行的golang代码速查表。
 * 编译成机器代码(没有JVM)
 * 没有类，但是有可以带方法的结构体
 * 接口类型Interfaces
-* 没有继承，但是有类型[类型嵌套](https://go.dev/doc/effective_go#embedding)
+* 没有继承，但是有[类型嵌套](https://go.dev/doc/effective_go#embedding)
 * 函数是一等公民
 * 函数可以返回多个值
 * 有闭包

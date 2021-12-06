@@ -49,7 +49,7 @@ golang-cheat-sheet是目前GitHub上最流行的golang代码速查表。
     * [Channel原则](#Channel原则)
 17. [打印](#打印)
 18. [反射](#反射)
-    * [switch类型](#switch类型)
+    * [类型switch](#类型switch)
     * [示例](https://github.com/a8m/reflect-examples)
 19. [代码片段](#代码片段)
     * [文件嵌入](#文件嵌入)
@@ -57,7 +57,7 @@ golang-cheat-sheet是目前GitHub上最流行的golang代码速查表。
 
 ## 致谢
 
-大多数代码示例来源于[A Tour of Go](https://go.dev/tour/list), 它对Go做了非常棒的介绍.
+大多数代码示例来源于[A Tour of Go](https://go.dev/tour/list)，它对Go做了非常棒的介绍。
 很认真地说，如果你是Go新手，一定要看完[A Tour of Go](https://go.dev/tour/list)。
 
 ## Go特性一览
@@ -140,7 +140,7 @@ var foo = 42 // 忽略类型，编译器自行推导
 foo := 42 // 简写，只能在函数或者方法体内使用，没有var关键字，变量类型也是隐式推导而来
 const constant = "This is a constant"
 
-// iota的值从0开始，可以用来can be used for incrementing numbers, starting from 0
+// iota的值从0开始，用于常量的数值递增
 const (
     _ = iota
     a
@@ -148,37 +148,37 @@ const (
     c = 1 << iota
     d
 )
-    fmt.Println(a, b) // 1 2 (0 is skipped)
+    fmt.Println(a, b) // 1 2 (0被赋值给了_，相当于被跳过了)
     fmt.Println(c, d) // 8 16 (2^3, 2^4)
 ```
 
 ## 函数
 ```go
-// a simple function
+// 一个简单的函数
 func functionName() {}
 
-// function with parameters (again, types go after identifiers)
+// 带参数的函数，参数的类型在标识符后面
 func functionName(param1 string, param2 int) {}
 
-// multiple parameters of the same type
+// 多个参数有相同的类型
 func functionName(param1, param2 int) {}
 
-// return type declaration
+// 返回值类型声明
 func functionName() int {
     return 42
 }
 
-// Can return multiple values at once
+// 可以返回多个值
 func returnMulti() (int, string) {
     return 42, "foobar"
 }
 var x, str = returnMulti()
 
-// Return multiple named results simply by return
+// 函数返回值有标识符，可以在函数体内对返回标识符赋值
 func returnMulti2() (n int, s string) {
     n = 42
     s = "foobar"
-    // n and s will be returned
+    // 只需要return即可，n和s的值会被返回
     return
 }
 var x, str = returnMulti2()
@@ -188,16 +188,15 @@ var x, str = returnMulti2()
 ### 函数作为值和闭包
 ```go
 func main() {
-    // assign a function to a name
+    // 把函数赋值给变量add, add是一个函数类型变量
     add := func(a, b int) int {
         return a + b
     }
-    // use the name to call the function
+    // 使用函数变量来调用函数
     fmt.Println(add(3, 4))
 }
 
-// Closures, lexically scoped: Functions can access values that were
-// in scope when defining the function
+// 闭包是匿名函数，闭包可以访问当前作用域可以访问到的变量
 func scope() func() int{
     outer_var := 2
     foo := func() int { return outer_var}
@@ -205,21 +204,21 @@ func scope() func() int{
 }
 
 func another_scope() func() int{
-    // won't compile because outer_var and foo not defined in this scope
+    // 编译失败，因为outer_var和foo没有在another_scope里定义
     outer_var = 444
     return foo
 }
 
 
-// Closures
+// 闭包
 func outer() (func() int, int) {
     outer_var := 2
     inner := func() int {
-        outer_var += 99 // outer_var from outer scope is mutated.
+        outer_var += 99 // 如果执行了闭包，闭包外面的outer_var的值会被修改
         return outer_var
     }
     inner()
-    return inner, outer_var // return inner func and mutated outer_var 101
+    return inner, outer_var // outer_var的值被改变，这里返回inner函数和101
 }
 ```
 
@@ -233,11 +232,11 @@ func main() {
 	fmt.Println(adder(nums...))	// 60
 }
 
-// By using ... before the type name of the last parameter you can indicate that it takes zero or more of those parameters.
-// The function is invoked like any other function except we can pass as many arguments as we want.
+// 在最后一个参数的类型前面加...表示函数的最后一个传参可以有0个或者多个
+// 函数调用和普通函数一样，只是我们可以传递任意多个参数
 func adder(args ...int) int {
 	total := 0
-	for _, v := range args { // Iterates over the arguments whatever the number.
+	for _, v := range args { // 遍历传进来的参数, args是一个slice类型变量
 		total += v
 	}
 	return total
@@ -253,16 +252,16 @@ string
 int  int8  int16  int32  int64
 uint uint8 uint16 uint32 uint64 uintptr
 
-byte // alias for uint8
+byte // uint8的别名
 
-rune // alias for int32 ~= a character (Unicode code point) - very Viking
+rune // int32的别名，主要用来表示字符类型
 
 float32 float64
 
 complex64 complex128
 ```
 
-All Go's predeclared identifiers are defined in the [builtin](https://golang.org/pkg/builtin/) package.  
+Go所有的内置类型都被定义在标准库的[builtin](https://pkg.go.dev/builtin)这个包里。
 
 ## 类型转换
 ```go
@@ -270,25 +269,25 @@ var i int = 42
 var f float64 = float64(i)
 var u uint = uint(f)
 
-// alternative syntax
+// 下面这种语法也可以，用于局部作用域
 i := 42
 f := float64(i)
 u := uint(f)
 ```
 
 ## 包
-* Package declaration at top of every source file
-* Executables are in package `main`
-* Convention: package name == last name of import path (import path `math/rand` => package `rand`)
-* Upper case identifier: exported (visible from other packages)
-* Lower case identifier: private (not visible from other packages)
+* 在每个Go源文件的最开头(不包括注释)添加包声明
+* 可执行文件在main包里
+* 惯例：包名 == 包导入路径的最后一个名称(导入路径 `math/rand` => 包名 `rand`)
+* 大写字母开头的标识符: 表示可导出(exported)标识符， 对其它包可见
+* 小写字母开头的标识符: 表示私有(private)标识符，对其它包不可见
 
 ## 控制结构
 
 ### If
 ```go
 func main() {
-	// Basic one
+	// 基本语法
 	if x > 10 {
 		return x
 	} else if x == 10 {
@@ -297,14 +296,14 @@ func main() {
 		return -x
 	}
 
-	// You can put one statement before the condition
+	// 在if条件前面可以加一条代码语句
 	if a := b + c; a < 42 {
 		return a
 	} else {
 		return a - 42
 	}
 
-	// Type assertion inside if
+	// 在if里做类型判断
 	var val interface{} = "foo"
 	if str, ok := val.(string); ok {
 		fmt.Println(str)
@@ -314,18 +313,20 @@ func main() {
 
 ### 循环
 ```go
-    // There's only `for`, no `while`, no `until`
+    // Go只有for，没有while和until关键字
     for i := 1; i < 10; i++ {
     }
-    for ; i < 10;  { // while - loop
+    for ; i < 10;  { // 相当while循环的效果
     }
-    for i < 10  { // you can omit semicolons if there is only a condition
+    for i < 10  { // 如果只有一个条件，可以省略分号，也相当于while循环
     }
-    for { // you can omit the condition ~ while (true)
+    for { // 可以忽略条件，相当于while (true)
     }
     
-    // use break/continue on current loop
-    // use break/continue with label on outer loop
+    // 循环里可以使用break/continue来控制循环执行逻辑
+    // break/continue还可以和循环外的label一起使用，用于控制外层循环的执行逻辑
+	// continue here表示外层的for循环继续执行，继续执行时外层for循环里的i会++
+	// break there表示退出外层循环，也就是退出整个循环了
 here:
     for i := 0; i < 2; i++ {
         for j := i + 1; j < 3; j++ {
@@ -355,11 +356,11 @@ there:
 
 ### Switch
 ```go
-    // switch statement
+    // switch语句
     switch operatingSystem {
     case "darwin":
         fmt.Println("Mac OS Hipster")
-        // cases break automatically, no fallthrough by default
+        // case分支里的代码执行完后会自动退出switch，默认没有fallthrough
     case "linux":
         fmt.Println("Linux Geek")
     default:
@@ -367,12 +368,12 @@ there:
         fmt.Println("Other")
     }
 
-    // as with for and if, you can have an assignment statement before the switch value
+    // 和if一样，switch的value之前可以添加一条赋值语句
     switch os := runtime.GOOS; os {
     case "darwin": ...
     }
 
-    // you can also make comparisons in switch cases
+    // switch的case条件还可以是比较语句
     number := 42
     switch {
         case number < 42:
@@ -383,7 +384,7 @@ there:
             fmt.Println("Greater")
     }
 
-    // cases can be presented in comma-separated lists
+    // case分支后还可以带多个值，用逗号分隔，任意一个匹配即可
     var char byte = '?'
     switch char {
         case ' ', '?', '&', '=', '#', '+', '%':
@@ -395,61 +396,61 @@ there:
 
 ### 数组
 ```go
-var a [10]int // declare an int array with length 10. Array length is part of the type!
-a[3] = 42     // set elements
-i := a[3]     // read elements
+var a [10]int // 声明一个长度为10的int数组，数组长度也是数组类型的一部分
+a[3] = 42     // 设置数组元素的值
+i := a[3]     // 读数组元素的值
 
-// declare and initialize
+// 声明和初始化
 var a = [2]int{1, 2}
-a := [2]int{1, 2} //shorthand
-a := [...]int{1, 2} // elipsis -> Compiler figures out array length
+a := [2]int{1, 2} //简写
+a := [...]int{1, 2} // 编译器自行推导数组长度
 ```
 
 ### 切片
 ```go
-var a []int                              // declare a slice - similar to an array, but length is unspecified
-var a = []int {1, 2, 3, 4}               // declare and initialize a slice (backed by the array given implicitly)
-a := []int{1, 2, 3, 4}                   // shorthand
+var a []int                             // 声明切片，和数组类型声明类似，不需要指定长度
+var a = []int {1, 2, 3, 4}              // 声明和初始化切片
+a := []int{1, 2, 3, 4}                   // 简写
 chars := []string{0:"a", 2:"c", 1: "b"}  // ["a", "b", "c"]
 
-var b = a[lo:hi]	// creates a slice (view of the array) from index lo to hi-1
-var b = a[1:4]		// slice from index 1 to 3
-var b = a[:3]		// missing low index implies 0
-var b = a[3:]		// missing high index implies len(a)
-a =  append(a,17,3)	// append items to slice a
-c := append(a,b...)	// concatenate slices a and b
+var b = a[lo:hi]	// 通过下标索引从已有的数组或切片创建新切片，下标前闭后开，取值从lo到hi-1
+var b = a[1:4]		// 取切片a的下标索引从1到3的值赋值给新切片b
+var b = a[:3]		// :前面没有值表示起始索引是0，等同于a[0:3]
+var b = a[3:]		// :后面没有值表示结束索引是len(a)，等同于a[3:len(a)]
+a =  append(a,17,3)	// 往切片里添加新元素
+c := append(a,b...)	// 把切片a和b的值拼接起来，组成新切片
 
-// create a slice with make
-a = make([]byte, 5, 5)	// first arg length, second capacity
-a = make([]byte, 5)	// capacity is optional
+// 使用make来创建切片
+a = make([]byte, 5, 5)	// make的第2个参数是切片长度，第3个参数是切片容量
+a = make([]byte, 5)	// 第3个切片容量参数可选，即可以不传值
 
-// create a slice from an array
+// 根据数组来创建切片
 x := [3]string{"Лайка", "Белка", "Стрелка"}
-s := x[:] // a slice referencing the storage of x
+s := x[:] // 切片s指向了数组x的内存空间，改变切片s的值，也会影响数组x的值
 ```
 
 ### 数组和切片上的操作
-`len(a)` gives you the length of an array/a slice. It's a built-in function, not a attribute/method on the array.
+`len(a)`可以用来计算数组或切片的长度，len()是Go的内置函数，不是数组或者切片的方法
 
 ```go
-// loop over an array/a slice
+// 循环遍历数组或切片
 for i, e := range a {
-    // i is the index, e the element
+    // i是下标索引，从0开始, e是具体的元素
 }
 
-// if you only need e:
+// 如果你只需要元素，不需要下标索引，可以按照下面的方式做:
 for _, e := range a {
-    // e is the element
+    // e是元素
 }
 
-// ...and if you only need the index
+// 如果你只需要下标索引，可以按照下面的方式做
 for i := range a {
 }
 
-// In Go pre-1.4, you'll get a compiler error if you're not using i and e.
-// Go 1.4 introduced a variable-free form, so that you can do this
+// Go 1.4之前, 如果range的前面不按照上面2个示例那样带上i和e，会编译报错
+// Go 1.4开始，可以不用带上i和e，直接for range遍历
 for range time.Tick(time.Second) {
-    // do it once a sec
+    // 每秒执行一次
 }
 
 ```
@@ -463,15 +464,15 @@ fmt.Println(m["key"])
 
 delete(m, "key")
 
-elem, ok := m["key"] // test if key "key" is present and retrieve it, if so
+elem, ok := m["key"] // 判断key是否存在：如果存在，ok就是true，elem是对应value，否则ok是false，elem是map的value的类型的零值
 
-// map literal
+// map字面值，声明的同时做初始化
 var m = map[string]Vertex{
     "Bell Labs": {40.68433, -74.39967},
     "Google":    {37.42202, -122.08408},
 }
 
-// iterate over map content
+// 遍历map
 for key, value := range m {
 }
 
@@ -479,43 +480,42 @@ for key, value := range m {
 
 ## 结构体
 
-There are no classes, only structs. Structs can have methods.
+Go没有class，只有结构体struct，结构体可以有自己的方法。
 ```go
-// A struct is a type. It's also a collection of fields
+// 结构体是一种类型，也是一系列字段的集合
 
-// Declaration
+// 声明
 type Vertex struct {
     X, Y int
 }
 
-// Creating
+// 创建结构体变量
 var v = Vertex{1, 2}
-var v = Vertex{X: 1, Y: 2} // Creates a struct by defining values with keys
-var v = []Vertex{{1,2},{5,2},{5,5}} // Initialize a slice of structs
+var v = Vertex{X: 1, Y: 2} // 通过字段名称:值的形式来创建结构体变量
+var v = []Vertex{{1,2},{5,2},{5,5}} // 初始化结构体切片
 
-// Accessing members
+// 访问结构体的字段
 v.X = 4
 
-// You can declare methods on structs. The struct you want to declare the
-// method on (the receiving type) comes between the the func keyword and
-// the method name. The struct is copied on each method call(!)
+// 给结构体定义方法，在func关键字和方法名称之间加上结构体声明(var_name StructName)即可
+// 调用方法时，会把结构体的值拷贝一份
 func (v Vertex) Abs() float64 {
     return math.Sqrt(v.X*v.X + v.Y*v.Y)
 }
 
-// Call method
+// 调用结构体方法
 v.Abs()
 
-// For mutating methods, you need to use a pointer (see below) to the Struct
-// as the type. With this, the struct value is not copied for the method call.
+// 如果想调用方法时改变外部结构体变量的值，方法需要使用指针接受者
+// 下面的方法，每次调用add方法时就不会拷贝结构体的值
 func (v *Vertex) add(n float64) {
     v.X += n
     v.Y += n
 }
 
 ```
-**Anonymous structs:**
-Cheaper and safer than using `map[string]interface{}`.
+**匿名结构体:**
+比使用`map[string]interface{}`更轻量、更安全。
 
 ```go
 point := struct {
@@ -525,26 +525,27 @@ point := struct {
 
 ## 指针
 ```go
-p := Vertex{1, 2}  // p is a Vertex
-q := &p            // q is a pointer to a Vertex
-r := &Vertex{1, 2} // r is also a pointer to a Vertex
+p := Vertex{1, 2}  // p是结构体Vertex的变量或者说实例
+q := &p            // q是指向Vertex的指针
+r := &Vertex{1, 2} // r也是指向Vertex的指针
 
-// The type of a pointer to a Vertex is *Vertex
+// Vertex指针的类型是*Vertex
 
-var s *Vertex = new(Vertex) // new creates a pointer to a new struct instance
+var s *Vertex = new(Vertex) // new函数创建一个指向Vertex实例的指针
 ```
 
 ## 接口
 ```go
-// interface declaration
+// 接口声明
 type Awesomizer interface {
     Awesomize() string
 }
 
-// types do *not* declare to implement interfaces
+// 结构体不会在声明的时候指定要实现某个接口
 type Foo struct {}
 
-// instead, types implicitly satisfy an interface if they implement all required methods
+// 相反，结构体如果实现了接口里的所有方法，那就隐式表明该结构体满足了该接口
+// 可以通过接口变量来调用结构体方法
 func (foo Foo) Awesomize() string {
     return "Awesome!"
 }
@@ -552,45 +553,45 @@ func (foo Foo) Awesomize() string {
 
 ## 接口和结构体嵌套
 
-There is no subclassing in Go. Instead, there is interface and struct embedding.
+Go没有子类的概念，不过Go有接口嵌套和结构体嵌套。
 
 ```go
-// ReadWriter implementations must satisfy both Reader and Writer
+// 接口嵌套，ReadWriter的实现一定要同时实现Reader和Writer这2个接口类型里的所有方法
 type ReadWriter interface {
     Reader
     Writer
 }
 
-// Server exposes all the methods that Logger has
+// 结构体嵌套，Server同时有了log.Logger的所有方法
 type Server struct {
     Host string
     Port int
     *log.Logger
 }
 
-// initialize the embedded type the usual way
+// 初始化嵌套结构体变量，和普通结构体初始化一样
 server := &Server{"localhost", 80, log.New(...)}
 
-// methods implemented on the embedded struct are passed through
-server.Log(...) // calls server.Logger.Log(...)
+// 被嵌套的结构体log.Logger的方法也自然成为了结构体Server的方法
+server.Log(...) // 相当于调用了server.Logger.Log(...)
 
-// the field name of the embedded type is its type name (in this case Logger)
+// 被嵌套的类型的字段名称是它的类型名称(在本代码示例里，被嵌套的类型*log.Logger的字段名称是它的类型名称Logger)
 var logger *log.Logger = server.Logger
 ```
 
 ## 错误处理
 
-There is no exception handling. Instead, functions that might produce an error just declare an additional return value of type [`error`](https://golang.org/pkg/builtin/#error). This is the `error` interface:
+Go没有异常处理。函数如果可能产生错误只需要再函数返回值里额外增加一个类型为[error](https://pkg.go.dev/builtin#error)的返回值。error接口类型的定义如下:
 
 ```go
-// The error built-in interface type is the conventional interface for representing an error condition,
-// with the nil value representing no error.
+// error接口类型是Go内置类型，用于表示错误
+// 值为nil时表示没有错误
 type error interface {
     Error() string
 }
 ```
 
-Here's an example:
+这里有一个示例:
 ```go
 func sqrt(x float64) (float64, error) {
 	if x < 0 {
@@ -602,11 +603,11 @@ func sqrt(x float64) (float64, error) {
 func main() {
 	val, err := sqrt(-1)
 	if err != nil {
-		// handle error
+		// 处理错误
 		fmt.Println(err) // negative value
 		return
 	}
-	// All is good, use `val`.
+	// 没有错误，打印结果
 	fmt.Println(val)
 }
 ```
@@ -614,48 +615,50 @@ func main() {
 # 并发
 
 ## 协程Goroutine
-Goroutines are lightweight threads (managed by Go, not OS threads). `go f(a, b)` starts a new goroutine which runs `f` (given `f` is a function).
+Goroutines是轻量级线程(由Go运行时来管理，不是操作系统线程)。 `go f(a, b)` 语句会开启了一个新的goroutine，这个goroutine执行`f(a, b)`这个函数调用。
 
 ```go
-// just a function (which can be later started as a goroutine)
+// 这里只是定义一个函数，后面用于goroutine执行
 func doStuff(s string) {
 }
 
 func main() {
-    // using a named function in a goroutine
+    // 在goroutine里使用有名称的函数
     go doStuff("foobar")
 
-    // using an anonymous inner function in a goroutine
+    // 在goroutine里使用匿名函数(闭包)
     go func (x int) {
-        // function body goes here
+        // 函数体定义
     }(42)
 }
 ```
 
 ## 管道Channel
 ```go
-ch := make(chan int) // create a channel of type int
-ch <- 42             // Send a value to the channel ch.
-v := <-ch            // Receive a value from ch
+ch := make(chan int) // 创建类型为int的管道
+ch <- 42             // 发送数据到管道ch
+v := <-ch            // 从管道ch接收数据
 
-// Non-buffered channels block. Read blocks when no value is available, write blocks until there is a read.
+// 没有缓冲区的管道会阻塞。
+// 如果没有往管道发送值，读操作会阻塞，如果没有从管道接收值，写操作会阻塞
 
-// Create a buffered channel. Writing to a buffered channels does not block if less than <buffer size> unread values have been written.
+// 创建带缓冲区的管道
+// 如果缓冲区未满，往有缓冲区的管道发送数据不会阻塞
 ch := make(chan int, 100)
 
-close(ch) // closes the channel (only sender should close)
+close(ch) // 关闭管道(只有往管道发送数据的发送者才应该执行close操作)
 
-// read from channel and test if it has been closed
+// 从管道读数据，并判断管道是否已经被关闭
 v, ok := <-ch
 
-// if ok is false, channel has been closed
+// 如果ok是false就表示管道已经被关闭了
 
-// Read from channel until it is closed
+// 从管道读数据，直到管道被关闭
 for i := range ch {
     fmt.Println(i)
 }
 
-// select blocks on multiple channel operations, if one unblocks, the corresponding case is executed
+// select关键字在多个管道操作上阻塞，只要有1个不阻塞了，对应case分支就会被执行
 func doStuff(channelOut, channelIn chan int) {
     select {
     case channelOut <- 42:
@@ -669,21 +672,21 @@ func doStuff(channelOut, channelIn chan int) {
 ```
 
 ### Channel原则
-- A send to a nil channel blocks forever
+- 给值为nil的管道发送数据会一直阻塞
 
   ```go
   var c chan string
   c <- "Hello, World!"
   // fatal error: all goroutines are asleep - deadlock!
   ```
-- A receive from a nil channel blocks forever
+- 从值为nil的管道接收数据会一直阻塞
 
   ```go
   var c chan string
   fmt.Println(<-c)
   // fatal error: all goroutines are asleep - deadlock!
   ```
-- A send to a closed channel panics
+- 往被关闭的管道发送数据会panic
 
   ```go
   var c = make(chan string, 1)
@@ -692,7 +695,7 @@ func doStuff(channelOut, channelIn chan int) {
   c <- "Hello, Panic!"
   // panic: send on closed channel
   ```
-- A receive from a closed channel returns the zero value immediately
+- 从被关闭的管道接收数据会立即返回零值
 
   ```go
   var c = make(chan int, 2)
@@ -708,23 +711,23 @@ func doStuff(channelOut, channelIn chan int) {
 ## 打印
 
 ```go
-fmt.Println("Hello, 你好, नमस्ते, Привет, ᎣᏏᏲ") // basic print, plus newline
+fmt.Println("Hello, 你好, नमस्ते, Привет, ᎣᏏᏲ") //基本的打印，会自动换行
 p := struct { X, Y int }{ 17, 2 }
-fmt.Println( "My point:", p, "x coord=", p.X ) // print structs, ints, etc
-s := fmt.Sprintln( "My point:", p, "x coord=", p.X ) // print to string variable
+fmt.Println( "My point:", p, "x coord=", p.X ) // 打印结构体和字段值
+s := fmt.Sprintln( "My point:", p, "x coord=", p.X ) // 打印内容到字符串变量里
 
-fmt.Printf("%d hex:%x bin:%b fp:%f sci:%e",17,17,17,17.0,17.0) // c-ish format
-s2 := fmt.Sprintf( "%d %f", 17, 17.0 ) // formatted print to string variable
+fmt.Printf("%d hex:%x bin:%b fp:%f sci:%e",17,17,17,17.0,17.0) // C风格的格式化打印
+s2 := fmt.Sprintf( "%d %f", 17, 17.0 ) // 字符串格式化
 
 hellomsg := `
  "Hello" in Chinese is 你好 ('Ni Hao')
  "Hello" in Hindi is नमस्ते ('Namaste')
-` // multi-line string literal, using back-tick at beginning and end
+` // 跨越多行的字符串，使用``
 ```
 
 ## 反射
-### Switch类型
-A type switch is like a regular switch statement, but the cases in a type switch specify types (not values), and those values are compared against the type of the value held by the given interface value.
+### 类型Switch
+类型switch类似普通的switch语句，只是case分支的判断条件是类型，而不是具体的值。使用场景主要是用于判断接口变量的值类型。
 ```go
 func do(i interface{}) {
 	switch v := i.(type) {
@@ -748,30 +751,56 @@ func main() {
 
 ## 文件嵌入
 
-Go programs can embed static files using the `"embed"` package as follows:
+Go程序可以使用embed包嵌入静态文件
 
 ```go
 package main
 
 import (
 	"embed"
+	"fmt"
+	"io"
 	"log"
 	"net/http"
 )
 
-// content holds the static content (2 files) or the web server.
-//go:embed a.txt b.txt
+// content持有服务器static目录下的所有文件
+//go:embed static/*
 var content embed.FS
 
 func main() {
 	http.Handle("/", http.FileServer(http.FS(content)))
-	log.Fatal(http.ListenAndServe(":8080", nil))
+	go func() {
+		log.Fatal(http.ListenAndServe(":8080", nil))
+	}()
+	// 读取服务器static目录下的内容
+	entries, err := content.ReadDir("static")
+	if err != nil {
+		log.Fatal(err)
+	}
+	for _, e := range entries {
+		resp, err := http.Get("http://localhost:8080/static/" + e.Name())
+		if err != nil {
+			log.Fatal(err)
+		}
+		body, err := io.ReadAll(resp.Body)
+		if err != nil {
+			log.Fatal(err)
+		}
+		if err := resp.Body.Close(); err != nil {
+			log.Fatal(err)
+		}
+		fmt.Printf("%q: %s", e.Name(), body)
+	}
 }
 ```
 
-[Full Playground Example](https://play.golang.org/p/pwWxdrQSrYv)
+[Go Playground代码示例](https://go.dev/play/p/pwWxdrQSrYv)
 
 ## HTTP服务器
+
+运行下面的代码，在浏览器访问http://127.0.0.1:4000会显示"hello"
+
 ```go
 package main
 
@@ -780,10 +809,11 @@ import (
     "net/http"
 )
 
-// define a type for the response
+// 定义处理http请求的Handler
 type Hello struct{}
 
-// let that type implement the ServeHTTP method (defined in interface http.Handler)
+// 结构体Hello实现接口类型http.Handler里的方法ServeHTTP
+// 这样结构体Hello的实例就可以作为http的Handler来接收http请求，返回http响应结果
 func (h Hello) ServeHTTP(w http.ResponseWriter, r *http.Request) {
     fmt.Fprint(w, "Hello!")
 }
@@ -793,7 +823,7 @@ func main() {
     http.ListenAndServe("localhost:4000", h)
 }
 
-// Here's the method signature of http.ServeHTTP:
+// 下面是http.ServerHTTP的方法签名
 // type Handler interface {
 //     ServeHTTP(w http.ResponseWriter, r *http.Request)
 // }

@@ -148,8 +148,8 @@ const (
     c = 1 << iota
     d
 )
-    fmt.Println(a, b) // 1 2 (0被赋值给了_，相当于被跳过了)
-    fmt.Println(c, d) // 8 16 (2^3, 2^4)
+fmt.Println(a, b) // 1 2 (0被赋值给了_，相当于被跳过了)
+fmt.Println(c, d) // 8 16 (2^3, 2^4)
 ```
 
 ## 函数
@@ -356,40 +356,40 @@ there:
 
 ### Switch
 ```go
-    // switch语句
-    switch operatingSystem {
-    case "darwin":
-        fmt.Println("Mac OS Hipster")
-        // case分支里的代码执行完后会自动退出switch，默认没有fallthrough
-    case "linux":
-        fmt.Println("Linux Geek")
-    default:
-        // Windows, BSD, ...
-        fmt.Println("Other")
-    }
+// switch语句
+switch operatingSystem {
+case "darwin":
+    fmt.Println("Mac OS Hipster")
+    // case分支里的代码执行完后会自动退出switch，默认没有fallthrough
+case "linux":
+    fmt.Println("Linux Geek")
+default:
+    // Windows, BSD, ...
+    fmt.Println("Other")
+}
 
-    // 和if一样，switch的value之前可以添加一条赋值语句
-    switch os := runtime.GOOS; os {
-    case "darwin": ...
-    }
+// 和if一样，switch的value之前可以添加一条赋值语句
+switch os := runtime.GOOS; os {
+case "darwin": ...
+}
 
-    // switch的case条件还可以是比较语句
-    number := 42
-    switch {
-        case number < 42:
-            fmt.Println("Smaller")
-        case number == 42:
-            fmt.Println("Equal")
-        case number > 42:
-            fmt.Println("Greater")
-    }
+// switch的case条件还可以是比较语句
+number := 42
+switch {
+    case number < 42:
+        fmt.Println("Smaller")
+    case number == 42:
+        fmt.Println("Equal")
+    case number > 42:
+        fmt.Println("Greater")
+}
 
-    // case分支后还可以带多个值，用逗号分隔，任意一个匹配即可
-    var char byte = '?'
-    switch char {
-        case ' ', '?', '&', '=', '#', '+', '%':
-            fmt.Println("Should escape")
-    }
+// case分支后还可以带多个值，用逗号分隔，任意一个匹配即可
+var char byte = '?'
+switch char {
+    case ' ', '?', '&', '=', '#', '+', '%':
+        fmt.Println("Should escape")
+}
 ```
 
 ## 数组，切片和range迭代

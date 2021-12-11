@@ -6,7 +6,7 @@ golang-cheat-sheet是目前GitHub上最流行的golang代码速查表。
 
 作者Ariel Mashraki也是Facebook著名ORM框架ent(2019年开源)的作者和首席布道师。
 
-本文是该速查表的中文版本，会根据原版实时更新。
+本项目是本人翻译的该速查表的中文版本，会根据原版实时更新。
 
 ## 版本
 

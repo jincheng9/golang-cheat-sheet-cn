@@ -10,7 +10,9 @@ golang-cheat-sheet是目前GitHub上最流行的golang代码速查表。
 
 ## 版本
 
-* 当前更新版本：2021-04-04 版本地址：[commit#master](https://github.com/a8m/golang-cheat-sheet/commit/0c55f5357b14663682f7dbc5b272d2338b9944a5)
+* 当前更新版本：2021-12-11 英文原版链接：[fix: description error#66](https://github.com/a8m/golang-cheat-sheet/commit/c4c5bb12ae74e850568550c06ab36706ffd29d99)。
+  * **Note**：英文原版最新合并的正是本人提交的fix。
+
 * 如果您发现更新、问题或改进，欢迎随时提issue或PR。
 * please feel free to open an issue or PR if you find any updates, issues or improvement.
 

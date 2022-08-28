@@ -10,9 +10,8 @@ golang-cheat-sheet是目前GitHub上最流行的golang代码速查表。
 
 ## 版本
 
-* 当前更新版本：2021-12-11 英文原版链接：[fix: description error#66](https://github.com/a8m/golang-cheat-sheet/commit/c4c5bb12ae74e850568550c06ab36706ffd29d99)。
-  * **Note**：英文原版最新合并的正是本人提交的fix。
-
+* 当前更新版本：2022-08-27 英文原版链接：[fix "mismatched types int and float64"#76](https://github.com/a8m/golang-cheat-sheet/commit/9c634033efeb0fdd45c8b08030be9d53d3c4ea73)。
+  
 * 如果您发现更新、问题或改进，欢迎随时提issue或PR。
 * please feel free to open an issue or PR if you find any updates, issues or improvement.
 
@@ -488,7 +487,7 @@ Go没有class，只有结构体struct，结构体可以有自己的方法。
 
 // 声明
 type Vertex struct {
-    X, Y int
+    X, Y float64
 }
 
 // 创建结构体变量
